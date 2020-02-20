@@ -1,3 +1,5 @@
+**Bottle Recycling for My Summer Car and MSCLoader (by piotrulos: https://github.com/piotrulos/MSCModLoader)**
+
 **Description**
 
 Save the world and your financial situation by drinking beer! And recycling the empty bottles!
