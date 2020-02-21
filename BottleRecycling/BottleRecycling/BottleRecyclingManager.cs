@@ -30,7 +30,7 @@ namespace BottleRecycling
         private FsmFloat BrokenWindow;
         private FsmString Subtitles;
 
-        string recyclingNoteString = "Bottle deposits: Glass bottle 0,33 (1mk), Empty beercase (14mk), Full beercase (38mk). No goverment's booze bottles!";
+        string recyclingNoteString = "Bottle deposits: Glass bottle 0,33 (1mk), Empty beer case (14mk), Full beer case (38mk). No goverment's booze bottles!";
 
         private GameObject ItemPivot;
 
