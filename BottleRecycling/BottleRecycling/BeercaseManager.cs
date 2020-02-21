@@ -86,7 +86,7 @@ namespace BottleRecycling
 
                     // show gui stuff
                     PlayMakerGlobals.Instance.Variables.GetFsmBool("GUIuse").Value = true;
-                    PlayMakerGlobals.Instance.Variables.GetFsmString("GUIinteraction").Value = "Put Bottle to Beercase";
+                    PlayMakerGlobals.Instance.Variables.GetFsmString("GUIinteraction").Value = "Put bottle to beer case";
                     if (Input.GetMouseButtonDown(0))
                     {
                         PutBottleToBeercase(ItemPivot.transform.GetChild(0).gameObject, other.gameObject);
