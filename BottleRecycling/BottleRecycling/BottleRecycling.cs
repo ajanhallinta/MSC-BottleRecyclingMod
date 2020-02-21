@@ -161,7 +161,6 @@ namespace BottleRecycling
                         {
                             if (int.TryParse(chars[1], out int _price))
                             {
-                                DebugPrint("chars: " + chars[0] + " : " + chars[1]);
                                 bottleRecyclingManager.customBottles.Add(chars[0]);
                                 bottleRecyclingManager.customBottlePrices.Add(_price);
                             }
