@@ -7,10 +7,12 @@ namespace BottleRecycling
 {
     public class BottleRecyclingManager : MonoBehaviour
     {
-        string teimoPath = "STORE/TeimoInShop/Pivot/Teimo/skeleton";
-        string teimoHandPath = "STORE/TeimoInShop/Pivot/Teimo/skeleton/pelvis/spine_middle/spine_upper/collar_left/shoulder_left/arm_left/hand_left/ItemPivot";
-        string teimoMoneyAnim = "teimo_give_drink";
-        string teimoIdleAnim = "teimo_lean_table_in";
+        const string TeimoPath = "STORE/TeimoInShop/Pivot/Teimo/skeleton";
+        const string TeimoHandPath = "STORE/TeimoInShop/Pivot/Teimo/skeleton/pelvis/spine_middle/spine_upper/collar_left/shoulder_left/arm_left/hand_left/ItemPivot";
+        GameObject teimoHand;
+        const string TeimoMoneyAnim = "teimo_give_drink";
+        const string TeimoIdleAnim = "teimo_lean_table_in";
+        Animation teimoAnimation;
 
         private bool isTeimoTakingBottle = false;
 
@@ -30,7 +32,7 @@ namespace BottleRecycling
         private FsmFloat BrokenWindow;
         private FsmString Subtitles;
 
-        string recyclingNoteString = "Bottle deposits: Glass bottle 0,33 (1mk), Empty beer case (14mk), Full beer case (38mk). No goverment's booze bottles!";
+        const string RecyclingNoteString = "Bottle deposits: Glass bottle 0,33 (1mk), Empty beer case (14mk), Full beer case (38mk). No goverment's booze bottles!";
 
         private GameObject ItemPivot;
 
@@ -57,6 +59,9 @@ namespace BottleRecycling
             GetStoreFsmVariables(); // OpenStore & BrokenWindow
             Subtitles = PlayMakerGlobals.Instance.Variables.GetFsmString("GUIsubtitle");
 
+            // Get Teimo stuff
+            teimoAnimation = GameObject.Find(TeimoPath).GetComponent<Animation>();
+            teimoHand = GameObject.Find(TeimoHandPath);
         }
 
         void GetStoreFsmVariables()
@@ -134,18 +139,18 @@ namespace BottleRecycling
                     if (Subtitles != null)
                         if (hit.transform.name == "Bottle Deposits Note")
                         {
-                            Subtitles.Value = recyclingNoteString;
+                            Subtitles.Value = RecyclingNoteString;
                         }
                         else
                         {
-                            if (Subtitles.Value == recyclingNoteString)
+                            if (Subtitles.Value == RecyclingNoteString)
                                 Subtitles.Value = "";
                         }
                 }
             }
             else // Away from Trigger (Raycast inactive)
             {
-                if (Subtitles.Value == recyclingNoteString)
+                if (Subtitles.Value == RecyclingNoteString)
                     Subtitles.Value = "";
             }
         }
@@ -211,10 +216,9 @@ namespace BottleRecycling
             try
             {
                 // play Teimo's "give drink" animation backwards
-                Animation teimoAnimation = GameObject.Find(teimoPath).GetComponent<Animation>();
-                teimoAnimation[teimoMoneyAnim].speed = -teimoAnimation[teimoMoneyAnim].speed;
-                teimoAnimation[teimoMoneyAnim].time = teimoAnimation[teimoMoneyAnim].length;
-                teimoAnimation.CrossFade(teimoMoneyAnim, 0.25f);
+                teimoAnimation[TeimoMoneyAnim].speed = -teimoAnimation[TeimoMoneyAnim].speed;
+                teimoAnimation[TeimoMoneyAnim].time = teimoAnimation[TeimoMoneyAnim].length;
+                teimoAnimation.CrossFade(TeimoMoneyAnim, 0.25f);
 
                 // disable given bottle collision and attach it to Teimo's hand
                 Rigidbody rb = bottleTransform.GetComponent<Rigidbody>();
@@ -223,7 +227,7 @@ namespace BottleRecycling
                     rb.isKinematic = true;
                     rb.detectCollisions = false;
                 }
-                bottleTransform.parent = GameObject.Find(teimoHandPath).transform;
+                bottleTransform.parent = teimoHand.transform;
                 bottleTransform.localPosition = Vector3.zero;
                 bottleTransform.localRotation = Quaternion.Euler(0, 0, 0);
             }
@@ -241,14 +245,13 @@ namespace BottleRecycling
             try
             {
                 // restore Teimo's animation speed
-                Animation teimoAnimation = GameObject.Find(teimoPath).GetComponent<Animation>();
-                teimoAnimation[teimoMoneyAnim].speed = Mathf.Abs(teimoAnimation[teimoMoneyAnim].speed);
+                teimoAnimation[TeimoMoneyAnim].speed = Mathf.Abs(teimoAnimation[TeimoMoneyAnim].speed);
               
                 try
                 {
                     // restore Teimo's idle animation
-                    teimoAnimation.Play(teimoIdleAnim);
-                    teimoAnimation[teimoIdleAnim].time = teimoAnimation[teimoIdleAnim].length;
+                    teimoAnimation.Play(TeimoIdleAnim);
+                    teimoAnimation[TeimoIdleAnim].time = teimoAnimation[TeimoIdleAnim].length;
                 } catch { }
             }
             catch
@@ -263,7 +266,7 @@ namespace BottleRecycling
             PlayMakerGlobals.Instance.Variables.FindFsmFloat("PlayerMoney").Value += totalMoneyAmountFromBottles;
             try
             {
-                GameObject.Find(teimoPath).GetComponent<Animation>().Play("teimo_cash_register");
+                teimoAnimation.Play("teimo_cash_register");
                 PlaySound(cash_register_2);
             }
             catch
