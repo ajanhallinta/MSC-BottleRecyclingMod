@@ -32,7 +32,7 @@ namespace BottleRecycling
         public override string ID => "BottleRecycling"; //My mod ID (unique)
         public override string Name => "Bottle Recycling"; //My mod name
         public override string Author => "ajanhallinta"; //My Username
-        public override string Version => "1.01"; //Version
+        public override string Version => "1.02"; //Version
 
         // Set this to true if you will be load custom assets from Assets folder.
         // This will create subfolder in Assets folder for your mod.
@@ -70,7 +70,7 @@ namespace BottleRecycling
             Settings.AddButton(this, clearEmptyBottles);
             Settings.AddHeader(this, "About");
             Settings.AddText(this, "Made by: ajanhallinta");
-            Settings.AddText(this, "Thanks to: Toplessgun, piotrulos, zamp, eps, haverdaven (DD), Keippa & Zeron");
+            Settings.AddText(this, "Thanks to: Toplessgun, piotrulos, Athlon007, zamp, eps, haverdaven (DD), Keippa & Zeron");
             Settings.AddText(this, "Save me from collecting bottles: https://www.paypal.me/ajanhallinta");
         }
 
