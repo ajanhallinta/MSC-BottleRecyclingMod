@@ -20,12 +20,14 @@ namespace BottleRecycling
             if (emptyBeerBottleRigidbody != null)
                 GameObject.Destroy(emptyBeerBottleRigidbody);
 
-            // Get and destroy bottle collider
+            // Get, disable and destroy bottle collider
             Collider emptyBeerBottleCollider = emptyBeerBottle.GetComponent<Collider>();
             if (emptyBeerBottleCollider != null)
+            {
+                emptyBeerBottleCollider.enabled = false; // Disabling collider now fixes saved filled beer case bottle positions from being out of place when spawning.
                 GameObject.Destroy(emptyBeerBottleCollider);
+            }
               
-
             emptyBeerBottle.tag = "Untagged";
             emptyBeerBottle.layer = LayerMask.NameToLayer("Default");
             emptyBeerBottle.name = "empty_bottle";
