@@ -20,7 +20,7 @@ namespace BottleRecycling
         public Transform pricesNoteVisual;
 
         private float distanceToReceiveMoneyTrigger;
-        private float distanceToNote;
+        private float distanceToNote = 69; // assign high value to prevent constant raycasting, when no note is present.
         public float totalMoneyAmountFromBottles = 0;
 
         private AudioSource cash_register_2;
