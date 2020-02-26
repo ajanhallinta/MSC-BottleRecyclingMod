@@ -20,7 +20,7 @@ Open Solution in Visual Studio 2017 and add references to following files (locat
 
 
 **Thanks**
-- Toplessgun, piotrulos, zamp, eps, haverdaven (DD), Keippa & Zeron.
+- Toplessgun, piotrulos, Athlon007, zamp, eps, haverdaven (DD), Keippa & Zeron.
 
 
 **Support:**
