@@ -156,11 +156,8 @@ namespace BottleRecycling
                 return;
 
             Rigidbody rb = other.GetComponent<Rigidbody>();
-            if (rb)
-            {
-                if (rb.velocity.magnitude > 0.25f)
-                    return;
-            }
+            if (rb && rb.velocity.magnitude > 0.25f)
+                return;
 
             // empty beer bottle
             if (other.name == "empty bottle(Clone)")
