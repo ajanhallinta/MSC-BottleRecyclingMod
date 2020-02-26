@@ -68,9 +68,7 @@ namespace BottleRecycling
 
         void OnTriggerStay(Collider other)
         {
-            if (ItemPivot == null)
-                return;
-            if (ItemPivot.transform.childCount == 0)
+            if (ItemPivot == null || ItemPivot.transform.childCount == 0)
                 return;
 
             if (other.name == "empty(itemx)" && isBeercase(other))

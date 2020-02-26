@@ -123,7 +123,6 @@ namespace BottleRecycling
                         if (ItemPivot != null)
                         {
                             if (hit.transform.name == "Bottle Receive Money Trigger" && ItemPivot.transform.childCount == 0)
-                            //if (hit.transform.name == "TeimoCollider" && ItemPivot.transform.childCount == 0)
                             {
                                 // show gui stuff
                                 PlayMakerGlobals.Instance.Variables.GetFsmBool("GUIuse").Value = true;
@@ -168,7 +167,7 @@ namespace BottleRecycling
         bool CannotTakeThisItem(Collider other)
         {
             return other.tag != "PART" || other.gameObject.layer == LayerMask.NameToLayer("Wheel") 
-                || isTeimoTakingBottle || !OpenStore.Value || BrokenWindow.Value > 0 ;
+                || isTeimoTakingBottle || !OpenStore.Value || BrokenWindow.Value > 0;
         }
 
         private void OnTriggerStay(Collider other)
