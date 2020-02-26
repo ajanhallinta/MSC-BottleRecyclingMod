@@ -137,6 +137,7 @@ namespace BottleRecycling
 
                     // bottle deposits note subtitles
                     if (Subtitles != null)
+                    {
                         if (hit.transform.name == "Bottle Deposits Note")
                         {
                             Subtitles.Value = RecyclingNoteString;
@@ -146,6 +147,7 @@ namespace BottleRecycling
                             if (Subtitles.Value == RecyclingNoteString)
                                 Subtitles.Value = "";
                         }
+                    }
                 }
             }
             else // Away from Trigger (Raycast inactive)
@@ -155,9 +157,24 @@ namespace BottleRecycling
             }
         }
 
+        /// <summary>
+        /// Returns true, if the item given to Teimo cannot be taken by following rules:
+        /// - "other" doesn't have "PART" tag
+        /// - "other" layer is "Wheel"
+        /// - Teimo is currently taking a bottle
+        /// - Store isn't open
+        /// - Player hasn't paid for broken window (if it's broken)
+        /// </summary>
+        bool CannotTakeThisItem(Collider other)
+        {
+            return other.tag != "PART" || other.gameObject.layer == LayerMask.NameToLayer("Wheel") 
+                || isTeimoTakingBottle || !OpenStore.Value || BrokenWindow.Value > 0 ;
+        }
+
         private void OnTriggerStay(Collider other)
         {
-            if (other.tag != "PART" || other.gameObject.layer == LayerMask.NameToLayer("Wheel") || isTeimoTakingBottle || !OpenStore.Value || BrokenWindow.Value > 0)
+            // Check if item can be taken by Teimo.
+            if (CannotTakeThisItem(other))
                 return;
 
             Rigidbody rb = other.GetComponent<Rigidbody>();
