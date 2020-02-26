@@ -32,7 +32,7 @@ namespace BottleRecycling
         public override string ID => "BottleRecycling"; //My mod ID (unique)
         public override string Name => "Bottle Recycling"; //My mod name
         public override string Author => "ajanhallinta"; //My Username
-        public override string Version => "1.0"; //Version
+        public override string Version => "1.01"; //Version
 
         // Set this to true if you will be load custom assets from Assets folder.
         // This will create subfolder in Assets folder for your mod.
