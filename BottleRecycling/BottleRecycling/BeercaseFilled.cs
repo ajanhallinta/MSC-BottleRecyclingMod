@@ -1,6 +1,4 @@
-﻿using MSCLoader;
-using UnityEngine;
-using System.Collections.Generic;
+﻿using UnityEngine;
 using System.Collections;
 
 namespace BottleRecycling
@@ -16,19 +14,16 @@ namespace BottleRecycling
                 return;
 
             emptyBeerBottle.SetActive(true);
+            
+            // Get and destroy bottle rigidbody
+            Rigidbody emptyBeerBottleRigidbody = emptyBeerBottle.GetComponent<Rigidbody>();
+            if (emptyBeerBottleRigidbody != null)
+                GameObject.Destroy(emptyBeerBottleRigidbody);
 
-            if (emptyBeerBottle.GetComponent<Rigidbody>() != null)
-            {
-                emptyBeerBottle.GetComponent<Rigidbody>().isKinematic = true;
-                emptyBeerBottle.GetComponent<Rigidbody>().detectCollisions = false;
-                emptyBeerBottle.GetComponent<Rigidbody>().useGravity = false;
-                GameObject.Destroy(emptyBeerBottle.GetComponent<Rigidbody>());
-            }
-            if (emptyBeerBottle.GetComponent<Collider>() != null)
-            {
-                emptyBeerBottle.GetComponent<Collider>().enabled = false;
-                GameObject.Destroy(emptyBeerBottle.GetComponent<Collider>());
-            }
+            // Get and destroy bottle collider
+            Collider emptyBeerBottleCollider = emptyBeerBottle.GetComponent<Collider>();
+            if (emptyBeerBottleCollider != null)
+                GameObject.Destroy(emptyBeerBottleCollider);
               
 
             emptyBeerBottle.tag = "Untagged";

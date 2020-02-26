@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
 
 namespace BottleRecycling
 {
@@ -56,13 +55,10 @@ namespace BottleRecycling
                 return;
 
             // update BeercaseManager Trigger collider position to GameObject in hand position
-            if (ItemPivot.transform.childCount > 0)
+            // if empty bottle is in player hands, put this object in same position
+            if (ItemPivot.transform.childCount > 0 && ItemPivot.transform.GetChild(0).name == "empty bottle(Clone)")
             {
-                // if empty bottle is in player hands, put this object in same position
-                if (ItemPivot.transform.GetChild(0).name == "empty bottle(Clone)")
-                {
-                    transform.position = ItemPivot.transform.GetChild(0).position;
-                }
+                transform.position = ItemPivot.transform.GetChild(0).position;
             }
             else
             {
@@ -72,25 +68,20 @@ namespace BottleRecycling
 
         void OnTriggerStay(Collider other)
         {
-            if (ItemPivot == null)
-                return;
-            if (ItemPivot.transform.childCount == 0)
+            if (ItemPivot == null || ItemPivot.transform.childCount == 0)
                 return;
 
-            if (other.name == "empty(itemx)")
+            if (other.name == "empty(itemx)" && isBeercase(other))
             {
-                if (isBeercase(other))
-                {
-                    if (BottleRecycling.isBoozeBottle(ItemPivot.transform.GetChild(0)))
-                        return;
+                if (BottleRecycling.isBoozeBottle(ItemPivot.transform.GetChild(0)))
+                    return;
 
-                    // show gui stuff
-                    PlayMakerGlobals.Instance.Variables.GetFsmBool("GUIuse").Value = true;
-                    PlayMakerGlobals.Instance.Variables.GetFsmString("GUIinteraction").Value = "Put bottle to beer case";
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        PutBottleToBeercase(ItemPivot.transform.GetChild(0).gameObject, other.gameObject);
-                    }
+                // show gui stuff
+                PlayMakerGlobals.Instance.Variables.GetFsmBool("GUIuse").Value = true;
+                PlayMakerGlobals.Instance.Variables.GetFsmString("GUIinteraction").Value = "Put bottle to beer case";
+                if (Input.GetMouseButtonDown(0))
+                {
+                    PutBottleToBeercase(ItemPivot.transform.GetChild(0).gameObject, other.gameObject);
                 }
             }
         }
@@ -135,9 +126,7 @@ namespace BottleRecycling
 
         public static Vector3 GetEmptyBottlePositionForBeercase(int id)
         {
-            if (id > bottlePositions.Count)
-                return Vector3.zero;
-            return bottlePositions[id];
+            return id > bottlePositions.Count ? Vector3.zero : bottlePositions[id];
         }
 
         public void PlaySound(AudioSource audio, Vector3 position)
@@ -147,6 +136,5 @@ namespace BottleRecycling
             audio.transform.position = position;
             audio.Play();
         }
-       
     }
 }
