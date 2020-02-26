@@ -1,6 +1,4 @@
-﻿using MSCLoader;
-using UnityEngine;
-using System.Collections.Generic;
+﻿using UnityEngine;
 using System.Collections;
 
 namespace BottleRecycling

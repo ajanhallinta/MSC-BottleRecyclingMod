@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
 
 namespace BottleRecycling
 {
@@ -56,13 +55,10 @@ namespace BottleRecycling
                 return;
 
             // update BeercaseManager Trigger collider position to GameObject in hand position
-            if (ItemPivot.transform.childCount > 0)
+            // if empty bottle is in player hands, put this object in same position
+            if (ItemPivot.transform.childCount > 0 && ItemPivot.transform.GetChild(0).name == "empty bottle(Clone)")
             {
-                // if empty bottle is in player hands, put this object in same position
-                if (ItemPivot.transform.GetChild(0).name == "empty bottle(Clone)")
-                {
-                    transform.position = ItemPivot.transform.GetChild(0).position;
-                }
+                transform.position = ItemPivot.transform.GetChild(0).position;
             }
             else
             {

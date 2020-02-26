@@ -302,15 +302,12 @@ namespace BottleRecycling
                     return 14;
                 default:
                     // custom bottles
-                    if(customBottles.Count>0)
+                    if(customBottles.Count > 0 && customBottles.Contains(bottleTransform.name))
                     {
-                        if(customBottles.Contains(bottleTransform.name))
+                        int index = customBottles.IndexOf(bottleTransform.name);
+                        if(index <= customBottlePrices.Count)
                         {
-                            int index = customBottles.IndexOf(bottleTransform.name);
-                            if(index <= customBottlePrices.Count)
-                            {
-                                return customBottlePrices[index];
-                            }
+                            return customBottlePrices[index];
                         }
                     }
                     // fail-safe
