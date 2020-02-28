@@ -9,10 +9,10 @@ namespace BottleRecycling
 
         public void CreateEmptyBottles()
         {
-            StartCoroutine(FixChildBottles());
+            StartCoroutine(SpawnChildBottles());
         }
 
-        IEnumerator FixChildBottles()
+        IEnumerator SpawnChildBottles()
         {
             // Wait game to initialize beer cases before spawning empty bottles.
             while (name != "empty(itemx)") yield return null;
