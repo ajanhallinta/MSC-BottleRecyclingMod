@@ -2,6 +2,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
+using HutongGames.PlayMaker;
 
 namespace BottleRecycling
 {
@@ -21,9 +23,7 @@ namespace BottleRecycling
 
     public class SaveDataFilledBeercase
     {
-        public string Name = "";
-        public Vector3 Position;
-        public float RotX, RotY, RotZ;
+        public string BeerCaseFsmID = "";
         public int bottleAmount;
     }
 
@@ -32,7 +32,7 @@ namespace BottleRecycling
         public override string ID => "BottleRecycling"; //My mod ID (unique)
         public override string Name => "Bottle Recycling"; //My mod name
         public override string Author => "ajanhallinta"; //My Username
-        public override string Version => "1.03"; //Version
+        public override string Version => "1.04"; //Version
 
         // Set this to true if you will be load custom assets from Assets folder.
         // This will create subfolder in Assets folder for your mod.
@@ -53,7 +53,6 @@ namespace BottleRecycling
 
         // Prefabs
         public static GameObject emptyBottlePrefab;
-        public static GameObject filledBeercasePrefab;
 
         AssetBundle ab;
 
@@ -186,6 +185,7 @@ namespace BottleRecycling
             ab.Unload(false); // unload assetbundle
         }
 
+
         void LoadSaveFile()
         {
             // Load Savefile
@@ -221,10 +221,10 @@ namespace BottleRecycling
                         }
                     }
 
-                    // Spawn Filled Beercases
-                    if (data.filledBeercases.Count > 0 && (bool)useFilledBeercases.GetValue())
+                    // Load Filled Beercases
+                    if ((bool)saveFilledBeercases.GetValue() && data.filledBeercases.Count > 0)
                     {
-                        beerCaseManager.StartCoroutine(SpawnSavedFilledBeercases(data));
+                        beerCaseManager.StartCoroutine(LoadSavedFilledBeerCases(data));
                     }
 
                     // Print Statistic to Console
@@ -240,59 +240,46 @@ namespace BottleRecycling
             }
         }
 
+        IEnumerator LoadSavedFilledBeerCases(SaveData saveData)
+        {
+            List<GameObject> beerCases = new List<GameObject>();
+
+            // Get all beer cases from the world
+            beerCases = GameObject.FindGameObjectsWithTag("PART").Where(x => x.name == "empty(itemx)").ToList();
+            beerCases.AddRange(GameObject.FindGameObjectsWithTag("PART").Where(x => x.name == "beer case(itemx)"));
+
+            foreach (SaveDataFilledBeercase saveDataFilledBeercase in saveData.filledBeercases)
+            {
+                foreach (GameObject emptyBeerCase in beerCases)
+                {
+                    PlayMakerFSM fsm = emptyBeerCase.GetComponent<PlayMakerFSM>();
+                    if (fsm != null)
+                    {
+                        // Is this beer case saved?
+                        if (fsm.FsmVariables.FindFsmString("ID").Value == saveDataFilledBeercase.BeerCaseFsmID)
+                        {
+                            BeercaseFilled filled = emptyBeerCase.AddComponent<BeercaseFilled>();
+                            filled.totalBottles = saveDataFilledBeercase.bottleAmount;
+
+                            // beercase0 parent needs to be null to be found by BeercaseManager
+                            if (fsm.FsmVariables.FindFsmString("ID").Value == "beercase0")
+                            {
+                                filled.transform.parent = null;
+                            }
+                        }
+                    }
+                }
+            }
+            yield return null;
+        }
+
+
         public void CreateFreshSaveFile()
         {
             SaveData sd = new SaveData();
             SaveLoad.SerializeSaveFile(this, sd, "BottleRecyclingSave.save");
             if((bool)printStats.GetValue())
                 DebugPrint("Created fresh savefile.");
-        }
-
-        IEnumerator SpawnSavedFilledBeercases(SaveData saveData)
-        {
-            yield return new WaitForEndOfFrame(); // wait one frame for apparently no reason
-
-            // Create Empty Beercase prefab
-            filledBeercasePrefab = GetEmptyBeercase(); 
-            filledBeercasePrefab.SetActive(true);
-            if (filledBeercasePrefab.GetComponent<PlayMakerFSM>())
-                GameObject.Destroy(filledBeercasePrefab.GetComponent<PlayMakerFSM>()); // Destroy FSM Component from clone.
-
-            yield return new WaitForEndOfFrame(); // wait one frame after destroying fsm
-
-            // Destroy all existing child bottles from Beercase prefab.
-            foreach (Transform child in filledBeercasePrefab.GetComponentsInChildren<Transform>())
-            {
-                if (child != filledBeercasePrefab.transform)
-                    GameObject.Destroy(child.gameObject);
-            }
-
-            yield return new WaitForEndOfFrame(); // wait one frame before creating empty bottles to case.
-
-            if(saveData.filledBeercases.Count>0)
-            {
-                foreach(SaveDataFilledBeercase filledBeercase in saveData.filledBeercases)
-                {
-                    // Create new Beercase
-                    GameObject newCase = GameObject.Instantiate(filledBeercasePrefab) as GameObject;
-                    newCase.transform.position = filledBeercase.Position;
-                    newCase.transform.eulerAngles = new Vector3(filledBeercase.RotX, filledBeercase.RotY, filledBeercase.RotZ);
-                    newCase.name = "empty(itemx)";
-
-                    // Make Beercase Fillable
-                    BeercaseFilled filled = newCase.AddComponent<BeercaseFilled>();
-                    // Add Empty Bottles GameObjects to New Beercase
-                    for (int i = 0; i < filledBeercase.bottleAmount; i++)
-                    {
-                        filled.AddBottleToBeerCase(GameObject.Instantiate(emptyBottlePrefab) as GameObject);
-                    }
-                }
-            }
-
-            // Empty Beercase prefab is not needed anymore; destroy it.
-            GameObject.Destroy(filledBeercasePrefab);
-
-            yield return null;
         }
 
         public override void OnSave()
@@ -323,7 +310,8 @@ namespace BottleRecycling
                         if (filled)
                         {
                             SaveDataFilledBeercase filledBeercase = CreateSaveDataFilledBeercase(go);
-                            sd.filledBeercases.Add(filledBeercase);
+                            if(filledBeercase != null)
+                                sd.filledBeercases.Add(filledBeercase);
                             continue;
                         }
                     }
@@ -346,64 +334,33 @@ namespace BottleRecycling
 
         SaveDataFilledBeercase CreateSaveDataFilledBeercase(GameObject go)
         {
-            SaveDataFilledBeercase filledBeercase = new SaveDataFilledBeercase();
-            filledBeercase.Name = go.name;
-            filledBeercase.Position = go.transform.position;
-            filledBeercase.RotX = go.transform.rotation.eulerAngles.x;
-            filledBeercase.RotY = go.transform.rotation.eulerAngles.y;
-            filledBeercase.RotZ = go.transform.rotation.eulerAngles.z;
-            filledBeercase.bottleAmount = go.GetComponent<BeercaseFilled>().totalBottles;
-            return filledBeercase;
+            SaveDataFilledBeercase saveDataFilledBeercase = null;
+            BeercaseFilled filled = go.GetComponent<BeercaseFilled>();
+            if(filled != null)
+            {
+                string beerCaseFsmID = "";
+                try
+                {
+                    beerCaseFsmID = go.GetComponent<PlayMakerFSM>().FsmVariables.FindFsmString("ID").Value;
+                }
+                catch { }
+                
+                if(!string.IsNullOrEmpty(beerCaseFsmID))
+                {
+                    saveDataFilledBeercase = new SaveDataFilledBeercase()
+                    {
+                        BeerCaseFsmID = beerCaseFsmID,
+                        bottleAmount = filled.totalBottles
+                    };
+                }
+            }
+            return saveDataFilledBeercase;
         }
+
 
         public static void DebugPrint(string message)
         {
             MSCLoader.ModConsole.Print("BottleRecyclingMod: " + message);
-        }
-
-        GameObject GetEmptyBeercase()
-        {
-
-            // Method 1
-            try
-            {
-                GameObject newCase = GameObject.Instantiate(GameObject.Find("ITEMS/empty(itemx)") as GameObject);
-                if (newCase != null)
-                {
-                    return newCase;
-                }
-                 
-            } catch
-            {
-                GameObject newCase = GameObject.Instantiate(GameObject.Find("ITEMS/beer case(itemx)") as GameObject);
-                if (newCase != null)
-                {
-                    return newCase;
-                }
-                  
-            }
-
-            // Method 2 (From World)
-            foreach (GameObject go in GameObject.FindGameObjectsWithTag("PART"))
-            {
-                if (go.name == "beer case(itemx)")
-                {
-                    foreach (PlayMakerFSM fsm in go.GetComponents<PlayMakerFSM>())
-                    {
-                        if (fsm.FsmName == "Use")
-                        {
-                            if (fsm.FsmVariables.FindFsmString("ID").Value.Contains("beercase"))
-                            {
-                                GameObject newCase = GameObject.Instantiate(go) as GameObject;
-                                return newCase;
-                            }
-                        }
-                    }
-                }
-            }
-
-            DebugPrint("Error: Can't find Beercase GameObject to Instantiate!");
-            return null;
         }
 
         public static void DestroyEmptyBottles()

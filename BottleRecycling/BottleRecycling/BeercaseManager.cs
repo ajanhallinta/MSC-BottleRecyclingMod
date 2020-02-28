@@ -47,6 +47,11 @@ namespace BottleRecycling
             {
                 BottleRecycling.DebugPrint("Error when trying to get bottle_empty2 sound.");
             }
+
+            foreach(BeercaseFilled filled in FindObjectsOfType<BeercaseFilled>())
+            {
+                filled.CreateEmptyBottles();
+            }
         }
 
         private void Update()
@@ -108,11 +113,6 @@ namespace BottleRecycling
             // Add BeercaseFilled -component
             if (beercase.GetComponent<BeercaseFilled>() == null)
                 beercase.AddComponent<BeercaseFilled>();
-            try
-            {
-                Destroy(beercase.GetComponent<PlayMakerFSM>()); // Remove PlayMakerFSM from Beercase
-            }
-            catch { }
 
             BeercaseFilled beercaseFilled = beercase.GetComponent<BeercaseFilled>();
 
@@ -122,6 +122,27 @@ namespace BottleRecycling
 
             beercaseFilled.AddBottleToBeerCase(bottle); // Add Empty Bottle to Beercase
             PlaySound(bottle_empty_2, beercase.transform.position); // Play Sound
+        }
+
+        // Get rid of beer case. Works mostly same as Disposal pit.
+        public static void DestroyBeercase(GameObject beerCase)
+        {
+            // null Parent (from Teimo's hand)
+            beerCase.transform.parent = null;
+
+            // Get Components
+            Rigidbody rb = beerCase.GetComponent<Rigidbody>();
+            Collider col = beerCase.GetComponent<Collider>();
+            MeshRenderer rend = beerCase.GetComponent<MeshRenderer>();
+            BeercaseFilled filled = beerCase.GetComponent<BeercaseFilled>();
+
+            // Destroy Components
+            if (rb) Destroy(rb); if (col) Destroy(col); if (rend) Destroy(rend); if (filled) Destroy(filled);
+
+            // Destroy Childs (Empty Bottles)
+            for (int i = 0; i < beerCase.transform.childCount; i++)
+                if (beerCase.transform.GetChild(i) != null)
+                    Destroy(beerCase.transform.GetChild(i).gameObject);
         }
 
         public static Vector3 GetEmptyBottlePositionForBeercase(int id)

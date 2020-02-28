@@ -190,22 +190,16 @@ namespace BottleRecycling
             // empty beercase
             if (other.name == "empty(itemx)")
             {
-                // identify gameobject as beercase from fsm id...
+                // identify gameobject as beercase from fsm id.
                 PlayMakerFSM fsm = other.GetComponent<PlayMakerFSM>();
                 if (fsm)
                 {
                     if (fsm.FsmVariables.FindFsmString("ID").Value.Contains("beercase"))
                     {
+                        fsm.FsmVariables.FindFsmBool("Consumed").Value = true; // this prevents beer case to be saved by game
                         StartCoroutine(TeimoTakesBottle(other.transform)); // start teimo bottle returning sequence
                         return;
                     }
-                }
-
-                // ... if it's not casual beercase, check if it has been filled with empty bottles.
-                BeercaseFilled filled = other.GetComponent<BeercaseFilled>();
-                if (filled)
-                {
-                    StartCoroutine(TeimoTakesBottle(other.transform)); // start teimo bottle returning sequence
                 }
             }
 
@@ -253,16 +247,27 @@ namespace BottleRecycling
             }
 
             yield return new WaitForSeconds(2.5f); // give time for Teimo to put bottle under desk
+
             AddMoneyToHold(GetBottleValue(bottleTransform));
-            Destroy(bottleTransform.gameObject); // destroy the bottle
+
+            // "Destroy" beer case
+            if(bottleTransform.name == "empty(itemx)")
+            {
+                BeercaseManager.DestroyBeercase(bottleTransform.gameObject);
+            }
+            // Destroy bottle
+            else
+            {
+                Destroy(bottleTransform.gameObject);
+            }
+
             PlaySound(bottle_empty_3);
             yield return new WaitForSeconds(3.5f); // wait for animation to approximately complete
 
             try
             {
                 // restore Teimo's animation speed
-                teimoAnimation[TeimoMoneyAnim].speed = Mathf.Abs(teimoAnimation[TeimoMoneyAnim].speed);
-              
+                teimoAnimation[TeimoMoneyAnim].speed = Mathf.Abs(teimoAnimation[TeimoMoneyAnim].speed);            
                 try
                 {
                     // restore Teimo's idle animation
@@ -274,6 +279,7 @@ namespace BottleRecycling
             {
                 BottleRecycling.DebugPrint("Error when restoring Teimo's animation speed.");
             }
+
             isTeimoTakingBottle = false; // bottle returning sequence is over
         }
 

@@ -7,6 +7,34 @@ namespace BottleRecycling
     {
         public int totalBottles = 0;
 
+        public void CreateEmptyBottles()
+        {
+            StartCoroutine(FixChildBottles());
+        }
+
+        IEnumerator FixChildBottles()
+        {
+            // Wait game to initialize beer cases before spawning empty bottles.
+            while (name != "empty(itemx)") yield return null;
+
+            int _totalBottles = totalBottles;
+
+            foreach(Transform child in GetComponentsInChildren<Transform>())
+            {
+                if(child != transform)
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+
+            totalBottles = 0;
+            for (int i = 0; i < _totalBottles; i++)
+            {
+                AddBottleToBeerCase(GameObject.Instantiate(BottleRecycling.emptyBottlePrefab) as GameObject);
+            }
+                
+        }
+
         public void AddBottleToBeerCase(GameObject emptyBeerBottle)
         {
             Vector3 bottleLocalPosition = BeercaseManager.GetEmptyBottlePositionForBeercase(totalBottles);
@@ -47,5 +75,6 @@ namespace BottleRecycling
             yield return new WaitForEndOfFrame();
             beerBottle.transform.parent = beercase.transform;
         }
+
     }
 }
