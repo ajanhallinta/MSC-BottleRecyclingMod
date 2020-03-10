@@ -7,8 +7,8 @@ namespace BottleRecycling
 {
     public class BottleRecyclingManager : MonoBehaviour
     {
-        const string TeimoPath = "STORE/TeimoInShop/Pivot/Teimo/skeleton";
-        const string TeimoHandPath = "STORE/TeimoInShop/Pivot/Teimo/skeleton/pelvis/spine_middle/spine_upper/collar_left/shoulder_left/arm_left/hand_left/ItemPivot";
+        const string TeimoPath = "TeimoInShop/Pivot/Teimo/skeleton";
+        const string TeimoHandPath = "TeimoInShop/Pivot/Teimo/skeleton/pelvis/spine_middle/spine_upper/collar_left/shoulder_left/arm_left/hand_left/ItemPivot";
         GameObject teimoHand;
         const string TeimoMoneyAnim = "teimo_give_drink";
         const string TeimoIdleAnim = "teimo_lean_table_in";
@@ -60,8 +60,9 @@ namespace BottleRecycling
             Subtitles = PlayMakerGlobals.Instance.Variables.GetFsmString("GUIsubtitle");
 
             // Get Teimo stuff
-            teimoAnimation = GameObject.Find(TeimoPath).GetComponent<Animation>();
-            teimoHand = GameObject.Find(TeimoHandPath);
+            GameObject store = GameObject.Find("STORE");
+            teimoAnimation = store.transform.Find(TeimoPath).gameObject.GetComponent<Animation>();
+            teimoHand = store.transform.Find(TeimoHandPath).gameObject;
         }
 
         void GetStoreFsmVariables()
