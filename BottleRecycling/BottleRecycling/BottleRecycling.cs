@@ -32,7 +32,7 @@ namespace BottleRecycling
         public override string ID => "BottleRecycling"; //My mod ID (unique)
         public override string Name => "Bottle Recycling"; //My mod name
         public override string Author => "ajanhallinta"; //My Username
-        public override string Version => "1.05"; //Version
+        public override string Version => "1.06"; //Version
 
         // Set this to true if you will be load custom assets from Assets folder.
         // This will create subfolder in Assets folder for your mod.
@@ -52,7 +52,8 @@ namespace BottleRecycling
         Settings clearEmptyBottles = new Settings("clearEmptyBottles", "Destroy empty bottles from map", DestroyEmptyBottles);
 
         // Prefabs
-        public static GameObject emptyBottlePrefab;
+        public static GameObject emptyBottlePrefab; // Physic Empty Bottles
+        public static GameObject emptyBottleStaticPrefab; // Empty Bottles for Beercases
 
         AssetBundle ab;
 
@@ -197,19 +198,16 @@ namespace BottleRecycling
                     // Get Unredeemed Bottle Deposits
                     bottleRecyclingManager.totalMoneyAmountFromBottles = data.unredeemedBottleDeposit;
 
-                    // Create Empty Bottle Prefab
-                    if((bool)saveEmptyBottles.GetValue() || (bool)saveFilledBeercases.GetValue())
+                    // Spawn Saved Bottles
+                    if ((bool)saveEmptyBottles.GetValue() && data.emptyBottles.Count > 0)
                     {
+                        // Create Empty Bottle Prefab (Physic)
                         GameObject bottlePrefab = ab.LoadAsset("EmptyBeerBottle") as GameObject;
                         bottlePrefab.tag = "PART";
                         bottlePrefab.layer = LayerMask.NameToLayer("Parts");
                         emptyBottlePrefab = GameObject.Instantiate(bottlePrefab) as GameObject;
-                        emptyBottlePrefab.SetActive(false);          
-                    }
+                        emptyBottlePrefab.SetActive(false);
 
-                    // Spawn Saved Bottles
-                    if ((bool)saveEmptyBottles.GetValue() && data.emptyBottles.Count > 0)
-                    {                    
                         // Spawn Empty Bottles
                         foreach (SaveDataEmptyBottle savedBottle in data.emptyBottles)
                         {
@@ -224,6 +222,12 @@ namespace BottleRecycling
                     // Load Filled Beercases
                     if ((bool)saveFilledBeercases.GetValue() && data.filledBeercases.Count > 0)
                     {
+                        // Load Non-Physic Empty Beer Bottle Prefab
+                        GameObject bottleStaticPrefab = ab.LoadAsset("EmptyBeerBottleStatic") as GameObject;
+                        emptyBottleStaticPrefab = GameObject.Instantiate(bottleStaticPrefab) as GameObject;
+                        emptyBottleStaticPrefab.SetActive(false);
+
+                        // Load Saved Filled Beercases
                         beerCaseManager.StartCoroutine(LoadSavedFilledBeerCases(data));
                     }
 

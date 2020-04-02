@@ -30,7 +30,7 @@ namespace BottleRecycling
             totalBottles = 0;
             for (int i = 0; i < _totalBottles; i++)
             {
-                AddBottleToBeerCase(GameObject.Instantiate(BottleRecycling.emptyBottlePrefab) as GameObject);
+                AddBottleToBeerCase(GameObject.Instantiate(BottleRecycling.emptyBottleStaticPrefab) as GameObject);
             }
                 
         }

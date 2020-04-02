@@ -231,10 +231,15 @@ namespace BottleRecycling
                 teimoAnimation[TeimoMoneyAnim].time = teimoAnimation[TeimoMoneyAnim].length;
                 teimoAnimation.CrossFade(TeimoMoneyAnim, 0.25f);
 
-                // destroy rigidbody from given bottle and attach it to Teimo's hand
+                // destroy rigidbody and collider from given bottle
                 Rigidbody rb = bottleTransform.GetComponent<Rigidbody>();
+                Collider col = bottleTransform.GetComponent<Collider>();
                 if(rb)
-                    Destroy(rb); // rb needs to be destroyed; otherwise modified rb values will revert on next frame.                   
+                    Destroy(rb); // rb needs to be destroyed; otherwise modified rb values will revert on next frame.
+                if (col)
+                    Destroy(col); // prevents Teimo for pushing things with empty bottle.
+
+                // attach bottle to Teimo's hand
                 bottleTransform.parent = teimoHand.transform;
                 bottleTransform.localPosition = Vector3.zero;
                 bottleTransform.localRotation = Quaternion.Euler(0, 0, 0);
